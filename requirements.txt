@@ -1,0 +1,5 @@
+pandas
+pytest
+sqlparse
+anthropic
+python-dotenv
