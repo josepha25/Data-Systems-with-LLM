@@ -209,3 +209,6 @@ __marimo__/
 # Database files
 *.db
 *.sqlite
+
+# Logs
+error_log.txt
