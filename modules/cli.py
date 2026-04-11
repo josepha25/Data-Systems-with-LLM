@@ -16,19 +16,17 @@ def print_results(result: dict):
         print("\n  No results found.\n")
         return
 
-    # Calculate column widths
+
     col_widths = [len(col) for col in columns]
     for row in rows:
         for i, val in enumerate(row):
             col_widths[i] = max(col_widths[i], len(str(val)))
 
-    # Print header
     header = " | ".join(col.ljust(col_widths[i]) for i, col in enumerate(columns))
     separator = "-+-".join("-" * w for w in col_widths)
     print(f"\n  {header}")
     print(f"  {separator}")
 
-    # Print rows
     for row in rows:
         line = " | ".join(str(val).ljust(col_widths[i]) for i, val in enumerate(row))
         print(f"  {line}")
@@ -64,12 +62,12 @@ def run_cli(db_path: str = "database.db"):
         if not user_input:
             continue
 
-        # EXIT
+
         if user_input.lower() == "exit":
             print("Goodbye!")
             break
 
-        # LOAD CSV
+
         elif user_input.lower().startswith("load "):
             path = user_input[5:].strip()
             try:
@@ -81,7 +79,7 @@ def run_cli(db_path: str = "database.db"):
             except Exception as e:
                 print(f"\n  Error: {e}\n")
 
-        # LIST TABLES
+
         elif user_input.lower() == "tables":
             tables = query_service.get_tables()
             if tables:
@@ -92,7 +90,7 @@ def run_cli(db_path: str = "database.db"):
             else:
                 print("\n  No tables found. Load a CSV first.\n")
 
-        # SHOW SCHEMA
+
         elif user_input.lower().startswith("schema "):
             table = user_input[7:].strip()
             schema = query_service.get_schema(table)
@@ -105,17 +103,17 @@ def run_cli(db_path: str = "database.db"):
             else:
                 print(f"\n  Table '{table}' not found.\n")
 
-        # DIRECT SQL
+
         elif user_input.lower().startswith("sql "):
             sql = user_input[4:].strip()
             result = query_service.execute(sql)
             print_results(result)
 
-        # NATURAL LANGUAGE
+
         elif user_input.lower().startswith("ask "):
             question = user_input[4:].strip()
 
-            # Initialize LLM adapter lazily
+
             if llm_adapter is None:
                 try:
                     llm_adapter = LLMAdapter()

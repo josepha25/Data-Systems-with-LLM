@@ -5,32 +5,22 @@ from modules.schema_manager import SchemaManager
 
 
 class CSVLoader:
-    """
-    Responsible for reading a CSV file and inserting its data
-    into the SQLite database via raw SQL (no df.to_sql).
-    """
+    # reads a CSV and puts the data into the database
 
     def __init__(self, db_path: str):
         self.db_path = db_path
         self.schema_manager = SchemaManager(db_path)
 
     def load(self, csv_path: str, table_name: str = None) -> dict:
-        """
-        Load a CSV file into the database.
-
-        Args:
-            csv_path: Path to the CSV file.
-            table_name: Optional table name override. Defaults to filename stem.
-
-        Returns:
-            dict with keys: table_name, rows_inserted, action
-        """
+        # loads a CSV file into the database
         if not os.path.exists(csv_path):
             raise FileNotFoundError(f"CSV file not found: {csv_path}")
 
+        # read and normalize column names
         df = pd.read_csv(csv_path)
         df.columns = [col.strip().lower().replace(" ", "_") for col in df.columns]
 
+        # use filename as table name if not specified
         if table_name is None:
             table_name = os.path.splitext(os.path.basename(csv_path))[0].lower()
 
@@ -44,7 +34,7 @@ class CSVLoader:
         }
 
     def _insert_rows(self, df: pd.DataFrame, table_name: str) -> int:
-        """Insert DataFrame rows into the table using parameterized SQL."""
+        # inserts rows using parameterized SQL, no df.to_sql()
         columns = ", ".join(df.columns)
         placeholders = ", ".join(["?" for _ in df.columns])
         sql = f"INSERT INTO {table_name} ({columns}) VALUES ({placeholders})"

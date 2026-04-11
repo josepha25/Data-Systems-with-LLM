@@ -6,33 +6,17 @@ load_dotenv()
 
 
 class LLMAdapter:
-    """
-    Translates natural language queries into SQL using Claude.
-    Does NOT execute SQL — that is the Query Service's job.
-    LLM output is treated as untrusted input and must be validated.
-    """
+    # sends user question to Claude and gets SQL back
 
     def __init__(self):
+        # load API key
         api_key = os.getenv("ANTHROPIC_API_KEY")
         if not api_key:
             raise ValueError("ANTHROPIC_API_KEY not found in environment.")
         self.client = anthropic.Anthropic(api_key=api_key)
 
     def translate(self, user_query: str, schema: dict) -> dict:
-        """
-        Translate a natural language query into SQL.
-
-        Args:
-            user_query: Plain English question from the user.
-            schema: dict mapping table_name -> list of column dicts
-
-        Returns:
-            dict with keys:
-                - success (bool)
-                - sql (str) if success
-                - explanation (str) if success
-                - error (str) if not success
-        """
+        # takes a plain english question and returns SQL
         if not user_query or not user_query.strip():
             return {"success": False, "sql": "", "explanation": "", "error": "Empty query."}
 
@@ -51,7 +35,7 @@ class LLMAdapter:
             return {"success": False, "sql": "", "explanation": "", "error": str(e)}
 
     def _build_prompt(self, user_query: str, schema: dict) -> str:
-        """Build the prompt with schema context."""
+        # builds the prompt with the database schema so Claude knows what tables exist
         schema_description = ""
         for table, columns in schema.items():
             col_names = ", ".join(
@@ -77,7 +61,7 @@ SQL: <your sql query here>
 EXPLANATION: <your explanation here>"""
 
     def _parse_response(self, raw: str) -> dict:
-        """Parse the LLM response into SQL and explanation."""
+        # pulls the SQL and explanation out of Claude's response
         sql = ""
         explanation = ""
 

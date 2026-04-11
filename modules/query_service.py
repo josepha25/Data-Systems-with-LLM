@@ -4,35 +4,18 @@ from modules.sql_validator import SQLValidator
 
 
 class QueryService:
-    """
-    Orchestrates the query flow.
-    CLI -> QueryService -> SQLValidator -> Database
-    Does NOT call the LLM directly (that's the LLM Adapter's job).
-    """
+    # middleman between the CLI and the database
 
     def __init__(self, db_path: str):
         self.db_path = db_path
         self.schema_manager = SchemaManager(db_path)
 
     def execute(self, sql: str) -> dict:
-        """
-        Validate and execute a SQL query.
-
-        Args:
-            sql: SQL string to validate and execute.
-
-        Returns:
-            dict with keys:
-                - success (bool)
-                - rows (list of tuples) if success
-                - columns (list of str) if success
-                - error (str) if not success
-        """
-        # Build validator from current schema
+        # validates then runs a SQL query
         schema = self._get_schema_for_validator()
         validator = SQLValidator(schema=schema)
 
-        # Validate first
+        # reject if invalid
         if not validator.validate(sql):
             return {
                 "success": False,
@@ -41,7 +24,7 @@ class QueryService:
                 "columns": []
             }
 
-        # Execute
+        # run it
         try:
             conn = sqlite3.connect(self.db_path)
             cursor = conn.cursor()
@@ -64,19 +47,19 @@ class QueryService:
             }
 
     def get_tables(self) -> list:
-        """Return all table names in the database."""
+        # returns all table names
         return self.schema_manager.get_tables()
 
     def get_schema(self, table_name: str) -> list:
-        """Return schema for a specific table."""
+        # returns schema for one table
         return self.schema_manager.get_schema(table_name)
 
     def get_all_schemas(self) -> dict:
-        """Return all schemas. Used by LLM Adapter."""
+        # returns all schemas, used by the LLM adapter
         return self.schema_manager.get_all_schemas()
 
     def _get_schema_for_validator(self) -> dict:
-        """Build schema dict in the format SQLValidator expects."""
+        # builds schema in the format the validator expects
         return {
             table: self.schema_manager.get_columns(table)
             for table in self.schema_manager.get_tables()
