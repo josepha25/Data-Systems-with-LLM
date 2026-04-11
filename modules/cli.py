@@ -40,17 +40,15 @@ def run_cli(db_path: str = "database.db"):
     csv_loader = CSVLoader(db_path)
     llm_adapter = None
 
-    print("\n" + "="*50)
-    print("  Data Systems with LLM Interface")
-    print("="*50)
-    print("  Commands:")
-    print("  load <path>     - Load a CSV file")
-    print("  tables          - List all tables")
-    print("  schema <table>  - Show table schema")
-    print("  sql <query>     - Run a SQL query directly")
-    print("  ask <question>  - Ask in natural language")
-    print("  exit            - Exit the program")
-    print("="*50 + "\n")
+    print("")
+    print("Commands: ")
+    print("  load path - load a csv file into the database")
+    print("  tables - show all tables")
+    print("  schema table - show columns for a table")
+    print("  sql query - run a sql query")
+    print("  ask question - ask in plain english")
+    print("  exit - quit")
+    print("")
 
     while True:
         try:
