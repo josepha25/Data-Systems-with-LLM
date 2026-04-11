@@ -212,3 +212,6 @@ __marimo__/
 
 # Logs
 error_log.txt
+
+# Mac
+.DS_Store
